@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "console": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "commandLineArgs": "get http://localhost:5212/weatherforecast -v",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
