@@ -2,29 +2,18 @@ using System.ComponentModel;
 
 namespace CurlDotnet.Commands;
 
-internal sealed class GetCommand : AsyncCommand<GetSettings>
+internal sealed class GetCommand(HttpClient client) : AsyncCommand<GetSettings>
 {
     public override async Task<int> ExecuteAsync(CommandContext context, GetSettings settings)
     {
         //TODO: Abstrair mais essa parte
-        AnsiConsole.MarkupLine($"[bold]Request Details:[/] {settings.Verbose} \n");
-
-        var httpClient = new HttpClient();
-
         var message = new HttpRequestMessage(HttpMethod.Get, settings.Uri);
 
         PrintRequest(message, settings.Verbose);
 
-        HttpResponseMessage response = await httpClient.SendAsync(message);
+        HttpResponseMessage response = await client.SendAsync(message);
 
-        if (response.IsSuccessStatusCode)
-        {
-            await PrintResult(response, settings.Verbose);
-        }
-        else
-        {
-            AnsiConsole.MarkupLine($"[red]Error: {response.StatusCode}[/]");
-        }
+        await PrintResult(response, settings.Verbose);
 
         Console.WriteLine("Request Details:i " + settings.Verbose);
 
@@ -39,10 +28,14 @@ internal sealed class GetCommand : AsyncCommand<GetSettings>
         if (verbose)
         {
             AnsiConsole.MarkupLine($"[bold yellow]< [/] {response.Version} {response.StatusCode}");
-            AnsiConsole.MarkupLine($"[bold yellow]< Content-Type:[/] {response.Content.Headers.ContentType}");
+            AnsiConsole.MarkupLine(
+                $"[bold yellow]< Content-Type:[/] {response.Content.Headers.ContentType}"
+            );
             AnsiConsole.MarkupLine($"[bold yellow]< Date:[/] {response.Headers.Date}");
             AnsiConsole.MarkupLine($"[bold yellow]< Server:[/] {response.Headers.Server}");
-            AnsiConsole.MarkupLine($"[bold yellow]< Transfer-Encoding:[/] {response.Headers.TransferEncoding}");
+            AnsiConsole.MarkupLine(
+                $"[bold yellow]< Transfer-Encoding:[/] {response.Headers.TransferEncoding}"
+            );
             AnsiConsole.WriteLine($"{content}");
         }
         else
